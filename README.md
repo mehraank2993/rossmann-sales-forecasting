@@ -41,6 +41,7 @@ the future, enabling better inventory planning and promotional decisions.
 pip install pandas numpy matplotlib seaborn xgboost scikit-learn jupyter
 jupyter notebook eda.ipynb
 ```
+🚀 **[Live Demo](https://rossmann-sales-forecasting-kwjxquacxuxj6qkzal4jwu.streamlit.app/)**
 
 ## Dataset
 [Rossmann Store Sales — Kaggle](https://www.kaggle.com/datasets/pratyushakar/rossmann-store-sales)
