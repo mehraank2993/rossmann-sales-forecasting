@@ -108,3 +108,66 @@ results = pd.DataFrame({
     'Error %': ((y_test.values - y_pred) / y_test.values * 100).round(2)
 })
 st.dataframe(results, use_container_width=True)
+
+# Multi-store comparison
+st.markdown("---")
+st.subheader("Multi-Store Comparison")
+
+st.markdown("**Top 10 Stores by Average Sales (reference)**")
+top_stores = df.groupby('Store')['Sales'].mean().round(0).sort_values(ascending=False).head(10).reset_index()
+top_stores.columns = ['Store', 'Avg Sales']
+st.dataframe(top_stores, use_container_width=True)
+
+selected_stores = st.multiselect(
+    "Select stores to compare (max 5)",
+    options=sorted(df['Store'].unique()),
+    default=[1, 2, 3]
+)
+
+if len(selected_stores) > 5:
+    st.warning("Select maximum 5 stores.")
+elif len(selected_stores) > 0:
+    comparison_results = []
+
+    for sid in selected_stores:
+        s = prepare_store(sid)
+        tr = s[s['Date'] < split_date]
+        te = s[s['Date'] >= split_date]
+
+        if len(te) == 0:
+            continue
+
+        m = XGBRegressor(n_estimators=500, learning_rate=0.05, max_depth=6,
+                         subsample=0.8, colsample_bytree=0.8, random_state=42)
+        m.fit(tr[features], tr['Sales'], verbose=False)
+        preds = m.predict(te[features])
+
+        mape_s = np.mean(np.abs((te['Sales'].values - preds) / te['Sales'].values)) * 100
+        mae_s = mean_absolute_error(te['Sales'], preds)
+        avg_pred = preds.mean()
+
+        comparison_results.append({
+            'Store': sid,
+            'Avg Predicted Sales': round(avg_pred, 0),
+            'MAE': round(mae_s, 0),
+            'MAPE %': round(mape_s, 2)
+        })
+
+    if comparison_results:
+        comp_df = pd.DataFrame(comparison_results)
+
+        # Bar chart — avg predicted sales per store
+        fig3, ax3 = plt.subplots(figsize=(10, 5))
+        ax3.bar(
+            [f"Store {r['Store']}" for r in comparison_results],
+            [r['Avg Predicted Sales'] for r in comparison_results],
+            color='steelblue'
+        )
+        ax3.set_title('Average Predicted Sales per Store (6-Week Forecast)')
+        ax3.set_xlabel('Store')
+        ax3.set_ylabel('Avg Predicted Sales')
+        ax3.grid(True, alpha=0.3)
+        st.pyplot(fig3)
+
+        st.subheader("Store Performance Metrics")
+        st.dataframe(comp_df, use_container_width=True)
