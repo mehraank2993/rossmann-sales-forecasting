@@ -28,12 +28,12 @@ the future, enabling better inventory planning and promotional decisions.
 
 ## Project Structure
 
-rossmann-sales-forecasting/
-│
-├── eda.ipynb              # Exploratory data analysis + model
-├── eda_overview.png       # EDA charts
-├── forecast_results.png   # Actual vs Predicted chart
-└── README.md
+    rossmann-sales-forecasting/
+    │
+    ├── eda.ipynb              # Exploratory data analysis + model
+    ├── eda_overview.png       # EDA charts
+    ├── forecast_results.png   # Actual vs Predicted chart
+    └── README.md
 
 
 ## How to Run
